@@ -1,0 +1,4 @@
+urlWebhookIFTTT = https://maker.ifttt.com/trigger/<event>/with/key/<key>
+url = http://192.168.1.1/jrd/webapi?api=GetSystemStatus
+pathLog = ./log
+minutiAttesa = 30
