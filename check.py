@@ -50,36 +50,32 @@ def check():
     r = req.post(configurazione["url"], data=json.dumps(d))
     informazioni = json.loads(r.content)["result"]
     batteria = int(informazioni["bat_cap"])
-    # TODO Controllare che in ac=1, altrimenti 2
     inCarica = informazioni["chg_state"]
     presa, informazioniPresa = getPresaTapo()
     statoPresa = informazioniPresa["device_on"]
 
-    if (inCarica == 1):
-        inCarica = True
-    else:
-        # Vale 2
-        inCarica = False
-
     scriviLog("Batteria: " + str(batteria) + ", inCarica: " + str(inCarica) + ", statoPresa: " + str(statoPresa))
 
-    if inCarica:
-        if batteria == 100:
-            sendIFTTTNotification(configurazione["urlWebhook"], "Batteria carica del modem TIM")
-            if spegniPresa(presa) == False:
-                sendIFTTTNotification(configurazione["urlWebhook"], "Errore nello spegnimento della presa Tapo")
-            time.sleep(60 * 5)
-        else:
-            time.sleep(60 * int(configurazione["minutiAttesa"]))
-    else:
-        if batteria < 16:
-            sendIFTTTNotification(configurazione["urlWebhook"], "Caricare modem TIM!!")
+    if inCarica == 0:
+        # Sta caricando
+        time.sleep(60 * int(configurazione["minutiAttesa"]))
+    elif inCarica == 1:
+        # Ha finito di caricare
+        sendIFTTTNotification(configurazione["urlWebhookIFTTT"], "Batteria carica del modem TIM")
+        if spegniPresa(presa) == False:
+            sendIFTTTNotification(configurazione["urlWebhookIFTTT"], "Errore nello spegnimento della presa Tapo")
+        time.sleep(60 * 5)
+        check()
+    elif inCarica == 2:
+        # Non è in carica
+        if batteria < int(configurazione["minimoBatteria"]):
+            sendIFTTTNotification(configurazione["urlWebhookIFTTT"], "Caricare modem TIM!!")
             if accendiPresa(presa) == False:
-                sendIFTTTNotification(configurazione["urlWebhook"], "Errore nell'accensione della presa Tapo")
+                sendIFTTTNotification(configurazione["urlWebhookIFTTT"], "Errore nell'accensione della presa Tapo")
             time.sleep(60 * 5)
         else:
             time.sleep(60 * int(configurazione["minutiAttesa"]))
-    check()
+        check()
 
 def sendIFTTTNotification(urlWebhook = "", testo = ""):
     req.post(urlWebhook, json={'value1': testo})
