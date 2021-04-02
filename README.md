@@ -1,5 +1,5 @@
 # checkModemAlcatelMW40V
- Programma che interroga la home del modem per recuperare informazioni per avvisare l'utente.
+ Programma che interroga la home del modem per recuperare informazioni, avvisare l'utente ed gestire l'alimentazione.
 
 ## Materiale utilizzato
  - Raspberry Pi 3B+;
