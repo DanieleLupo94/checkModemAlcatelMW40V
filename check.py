@@ -47,7 +47,22 @@ def spegniPresa(presa):
 
 def check():
     configurazione = getConfigurazione()
-    r = req.post(configurazione["url"], data=json.dumps(d))
+    headers = {"Host": "mw40.home",
+                "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:88.0) Gecko/20100101 Firefox/88.0",
+                "Accept": "text/plain, */*; q=0.01",
+                "Accept-Language": "it-IT,it;q=0.8,en-US;q=0.5,en;q=0.3",
+                "Accept-Encoding": "gzip, deflate",
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                "_TclRequestVerificationKey": "KSDHSDFOGQ5WERYTUIQWERTYUISDFG1HJZXCVCXBN2GDSMNDHKVKFsVBNf",
+                "_TclRequestVerificationToken": "null",
+                "X-Requested-With": "XMLHttpRequest",
+                "Content-Length": "70",
+                "Origin": "http://mw40.home",
+                "Connection": "keep-alive",
+                "Referer": "http://mw40.home/index.html",
+                "Cookie": "",
+                "Sec-GPC": "1"}
+    r = req.post(configurazione["url"], data=json.dumps(d), headers=headers)
     informazioni = json.loads(r.content)["result"]
     batteria = int(informazioni["bat_cap"])
     inCarica = informazioni["chg_state"]
@@ -101,6 +116,7 @@ try:
     main()
 except:
     scriviLog("Qualquadra non cosa")
+    sendIFTTTNotification(getConfigurazione()["urlWebhookIFTTT"], "Qualquadra non cosa.")
     main()
 finally:
     scriviLog("Passo e chiudo")
