@@ -59,6 +59,7 @@ def check():
     if inCarica == 0:
         # Sta caricando
         time.sleep(60 * int(configurazione["minutiAttesa"]))
+        check()
     elif inCarica == 1:
         # Ha finito di caricare
         sendIFTTTNotification(configurazione["urlWebhookIFTTT"], "Batteria carica del modem TIM")
@@ -89,6 +90,20 @@ def scriviLog(testo):
     fileLog.write(t)
     fileLog.write("\n")
     fileLog.close()
+    '''if getConfigurazione()["urlOnlineLogWriter"]:
+        req.post(getConfigurazione()["urlOnlineLogWriter"], data={'riga': t})'''
 
-scriviLog("Avvio")
-check()
+def main():
+    scriviLog("Avvio")
+    check()
+
+try:
+    main()
+except:
+    scriviLog("Qualquadra non cosa")
+    main()
+finally:
+    scriviLog("Passo e chiudo")
+    configurazione = getConfigurazione()
+    sendIFTTTNotification(configurazione["urlWebhookIFTTT"], "Programma terminato.")
+    
